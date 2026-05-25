@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroEdge AI | The Cockpit's Digital Guardian</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% if socketio_enabled %}
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    {% endif %}
+</head>
+<body class="control-body" x-data="{clock: new Date().toLocaleTimeString('en-US', {hour12:false})}" x-init="setInterval(() => clock = new Date().toLocaleTimeString('en-US', {hour12:false}), 1000)">
+    <div class="control-background"></div>
+
+    <main class="control-shell">
+
+        <header id="top-panel" class="top-panel state-{{ status_class }}">
+            <div class="hero-left">
+                <p class="subhead">TEAM GARUDA &nbsp;·&nbsp; EDGE INTELLIGENCE PLATFORM</p>
+                <h1 class="heading">AeroEdge <span class="heading-accent">AI</span></h1>
+                <p class="muted">Real-Time Fault Detection &amp; Predictive Maintenance &nbsp;·&nbsp; Cockpit-Grade Intelligence</p>
+            </div>
+
+            <div class="hero-center">
+                <div id="hero-badge" class="hero-badge">
+                    <span id="hero-badge-dot" class="hero-badge-dot"></span>
+                    <span id="hero-badge-label" class="hero-badge-label">
+                        {% if status_class == 'critical' %}&#9888; CRITICAL ALERT{% elif status_class == 'warning' %}&#9888; WARNING{% else %}LIVE TELEMETRY{% endif %}
+                    </span>
+                </div>
+                <div id="hero-tagline" class="hero-tagline">
+                    {% if status_class == 'critical' %}Critical fault detected &nbsp;·&nbsp; Immediate action required{% elif status_class == 'warning' %}Warning threshold exceeded &nbsp;·&nbsp; Monitor closely{% else %}Powered by Isolation Forest ML &nbsp;·&nbsp; Edge-deployed AI{% endif %}
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="meta-group">
+                    <span class="meta-label">System Clock</span>
+                    <span id="system-clock" class="meta-value" x-text="clock"></span>
+                </div>
+                <div class="meta-group">
+                    <span class="meta-label">Sensor Snapshot</span>
+                    <span id="current-time" class="meta-value">{{ current_time }}</span>
+                </div>
+                <span id="status-pill" class="status-pill status-{{ status_class }}">{{ status }}</span>
+            </div>
+        </header>
+
+        <div id="critical-banner" class="critical-banner-hidden"></div>
+
+        <section class="metrics-grid">
+            <article class="metric-card">
+                <p class="metric-label">HPC Outlet Temp</p>
+                <p id="metric-engine-temp" class="metric-value">{{ engine_temp }} <span class="metric-unit">°R</span></p>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">Fan Speed (Nf)</p>
+                <p id="metric-vibration" class="metric-value">{{ vibration }} <span class="metric-unit">rpm</span></p>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">Fuel-Air Ratio</p>
+                <p id="metric-oil-pressure" class="metric-value">{{ oil_pressure }} <span class="metric-unit"></span></p>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">LPC Outlet Pressure</p>
+                <p id="metric-fuel-flow" class="metric-value">{{ fuel_flow }} <span class="metric-unit">psi</span></p>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">HPC Outlet Pressure</p>
+                <p id="metric-hydraulic-pressure" class="metric-value">{{ hydraulic_pressure }} <span class="metric-unit">psi</span></p>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">AI Health Score</p>
+                <p id="metric-health-score" class="metric-value">{{ health_score }} <span class="metric-unit">%</span></p>
+            </article>
+        </section>
+
+        <section class="content-grid">
+
+            <div class="main-column">
+                <section class="telemetry-grid">
+                    <article class="panel stream-panel">
+                        <div class="panel-head">
+                            <h2>Live Sensor Trends</h2>
+                            <span class="chip chip-cyan">Rolling {{ temp_history|length }}-sample window</span>
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="tempChart"></canvas>
+                        </div>
+                    </article>
+
+                    <article class="panel radar-panel">
+                        <div class="panel-head">
+                            <h2>Aircraft Radar Scan</h2>
+                            <span id="prediction-chip" class="chip {% if prediction == -1 %}chip-red{% else %}chip-green{% endif %}">
+                                {% if prediction == -1 %}ANOMALY{% else %}NORMAL{% endif %}
+                            </span>
+                        </div>
+                        <div class="aircraft-stage">
+                            <div class="radar-ring"></div>
+                            <div class="radar-ring ring-delayed"></div>
+                            <img src="{{ url_for('static', filename='images/aircraft.png') }}" alt="Aircraft" class="aircraft-image">
+                            <span id="engine-dot" class="engine-dot {% if not critical %}hidden{% endif %}"></span>
+                        </div>
+                    </article>
+                </section>
+            </div>
+
+            <aside class="side-column">
+                <article class="panel analysis-panel">
+                    <div class="panel-head">
+                        <h2>AI Anomaly Interpretation</h2>
+                        <span id="risk-chip" class="chip chip-amber">Risk Index {{ 100 - health_score }}</span>
+                    </div>
+                    <div class="analysis-grid">
+                        <p><span class="label">Status</span><span id="analysis-status" class="value">{{ status }}</span></p>
+                        <p><span class="label">Model Signal</span><span id="analysis-signal" class="value">{% if prediction == -1 %}Outlier{% else %}Nominal{% endif %}</span></p>
+                        <p><span class="label">Assessment</span><span id="analysis-text" class="value">{{ analysis }}</span></p>
+                        <p><span class="label">Action</span><span id="action-text" class="value">{{ action }}</span></p>
+                    </div>
+                </article>
+
+                <article class="panel limits-panel">
+                    <div class="panel-head">
+                        <h2>Operating Limits</h2>
+                    </div>
+                    <table class="limits-table">
+                        <thead>
+                            <tr><th>Parameter</th><th>Warning</th><th>Critical</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>HPC Outlet Temp</td><td>&gt; 1415 °R</td><td>&gt; 1425 °R</td></tr>
+                            <tr><td>Fan Speed (Nf)</td><td>&gt; 9075 rpm</td><td>&gt; 9110 rpm</td></tr>
+                            <tr><td>Fuel-Air Ratio</td><td>—</td><td>&lt; 38.50</td></tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article class="panel feed-panel">
+                    <div class="panel-head">
+                        <h2>Operations Feed</h2>
+                        <span id="feed-mode" class="chip {% if socketio_enabled %}chip-green{% else %}chip-amber{% endif %}">
+                            {% if socketio_enabled %}Socket Pending{% else %}Polling Live{% endif %}
+                        </span>
+                    </div>
+                    <ul id="alert-feed" class="alert-feed">
+                        <li>
+                            <span class="feed-time">{{ current_time }}</span>
+                            <span class="feed-status {{ status_class }}">{{ status }}</span>
+                            <span class="feed-text">{{ analysis }}</span>
+                        </li>
+                    </ul>
+                </article>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        window.GARUDA_STATE = {{ {
+            "engine_temp": engine_temp,
+            "vibration": vibration,
+            "oil_pressure": oil_pressure,
+            "fuel_flow": fuel_flow,
+            "hydraulic_pressure": hydraulic_pressure,
+            "health_score": health_score,
+            "status": status,
+            "status_class": status_class,
+            "analysis": analysis,
+            "action": action,
+            "critical": critical,
+            "prediction": prediction,
+            "current_time": current_time,
+            "temp_history": temp_history,
+            "vib_history": vib_history,
+            "oil_history": oil_history,
+        } | tojson }};
+        window.GARUDA_SOCKET_ENABLED = {{ socketio_enabled | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

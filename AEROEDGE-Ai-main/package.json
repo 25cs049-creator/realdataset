@@ -1,0 +1,13 @@
+{
+  "name": "garuda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GARUDA airport operations dashboard UI assets",
+  "scripts": {
+    "build:css": "tailwind -c tailwind.config.js -i ./static/css/tailwind-input.css -o ./static/css/dashboard.css --minify",
+    "watch:css": "tailwind -c tailwind.config.js -i ./static/css/tailwind-input.css -o ./static/css/dashboard.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
