@@ -1,0 +1,281 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --tone-ok: #22c55e;
+    --tone-warn: #f59e0b;
+    --tone-crit: #ef4444;
+    --tone-cyan: #22d3ee;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-slate-950 font-body text-slate-100 antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply m-0 font-display tracking-tight;
+  }
+
+  p {
+    @apply m-0;
+  }
+}
+
+@layer components {
+  .control-body {
+    @apply relative overflow-x-hidden bg-slate-950;
+  }
+
+  .control-background {
+    @apply pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(15,23,42,0.85),transparent_50%),radial-gradient(circle_at_90%_0%,rgba(30,41,59,0.62),transparent_35%),linear-gradient(180deg,#020617_0%,#020617_70%,#0f172a_100%)];
+  }
+
+  .control-background::before {
+    content: "";
+    @apply absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[size:42px_42px] opacity-35;
+  }
+
+  .control-shell {
+    @apply relative mx-auto w-full max-w-[1700px] p-3 sm:p-4 lg:p-5;
+  }
+
+  .panel {
+    @apply rounded-xl border border-slate-700/70 bg-slate-900/75 p-4 shadow-panel backdrop-blur-sm;
+  }
+
+  .top-panel {
+    @apply flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between;
+  }
+
+  .subhead {
+    @apply text-[11px] uppercase tracking-[0.18em] text-cyan-300;
+  }
+
+  .heading {
+    @apply mt-1 text-xl font-semibold text-slate-100 sm:text-2xl;
+  }
+
+  .muted {
+    @apply mt-1 text-sm text-slate-400;
+  }
+
+  .header-right {
+    @apply flex flex-wrap items-center gap-2 lg:gap-4;
+  }
+
+  .meta-group {
+    @apply rounded-lg border border-slate-700/70 bg-slate-950/70 px-3 py-2;
+  }
+
+  .meta-label {
+    @apply block text-[10px] uppercase tracking-[0.12em] text-slate-400;
+  }
+
+  .meta-value {
+    @apply block font-mono text-sm text-slate-100;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.08em];
+  }
+
+  .status-normal {
+    @apply border-emerald-400/50 bg-emerald-500/15 text-emerald-300;
+  }
+
+  .status-warning {
+    @apply border-amber-400/50 bg-amber-400/15 text-amber-300;
+  }
+
+  .status-critical {
+    @apply border-red-400/50 bg-red-500/15 text-red-300;
+  }
+
+  .critical-banner {
+    @apply mt-3 rounded-lg border border-red-400/45 bg-red-500/15 px-4 py-2 text-center text-xs font-semibold tracking-[0.1em] text-red-200;
+  }
+
+  .content-grid {
+    @apply mt-3 grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)];
+  }
+
+  .main-column,
+  .side-column {
+    @apply flex flex-col gap-3;
+  }
+
+  .metrics-grid {
+    @apply grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6;
+  }
+
+  .metric-card {
+    @apply rounded-xl border border-slate-700/70 bg-slate-900/75 px-3 py-3 shadow-panel;
+  }
+
+  .metric-label {
+    @apply text-[11px] uppercase tracking-[0.08em] text-slate-400;
+  }
+
+  .metric-value {
+    @apply mt-2 text-xl font-semibold leading-none text-cyan-300;
+  }
+
+  .metric-unit {
+    @apply text-xs font-medium text-slate-400;
+  }
+
+  .telemetry-grid {
+    @apply grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)];
+  }
+
+  .panel-head {
+    @apply mb-3 flex items-center justify-between gap-2;
+  }
+
+  .panel-head h2 {
+    @apply text-sm font-semibold uppercase tracking-[0.08em] text-slate-200;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em];
+  }
+
+  .chip-cyan {
+    @apply border-cyan-400/45 bg-cyan-500/10 text-cyan-200;
+  }
+
+  .chip-green {
+    @apply border-emerald-400/45 bg-emerald-500/10 text-emerald-200;
+  }
+
+  .chip-amber {
+    @apply border-amber-400/45 bg-amber-500/10 text-amber-200;
+  }
+
+  .chip-red {
+    @apply border-red-400/45 bg-red-500/10 text-red-200;
+  }
+
+  .chart-wrap {
+    @apply h-[300px] w-full;
+  }
+
+  .aircraft-stage {
+    @apply relative flex h-[300px] items-center justify-center overflow-hidden rounded-lg border border-slate-700/65 bg-slate-950/75;
+  }
+
+  .radar-ring {
+    @apply absolute h-52 w-52 rounded-full border border-cyan-400/30;
+    animation: sweep 9s linear infinite;
+  }
+
+  .ring-delayed {
+    @apply h-64 w-64 border-cyan-300/20;
+    animation-duration: 13s;
+    animation-direction: reverse;
+  }
+
+  .aircraft-image {
+    @apply relative z-10 w-[85%] max-w-[380px] drop-shadow-[0_0_25px_rgba(34,211,238,0.28)];
+  }
+
+  .engine-dot {
+    @apply absolute z-20 h-4 w-4 rounded-full bg-red-400 shadow-[0_0_20px_rgba(248,113,113,0.9)];
+    top: 56%;
+    left: 49%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .analysis-grid {
+    @apply grid gap-2 text-sm;
+  }
+
+  .analysis-grid p {
+    @apply grid grid-cols-[130px_1fr] items-start gap-2;
+  }
+
+  .analysis-grid .label {
+    @apply text-slate-400;
+  }
+
+  .analysis-grid .value {
+    @apply text-slate-100;
+  }
+
+  .limits-table {
+    @apply w-full border-collapse text-xs;
+  }
+
+  .limits-table th,
+  .limits-table td {
+    @apply border-b border-slate-700/70 px-2 py-2 text-left;
+  }
+
+  .limits-table th {
+    @apply font-semibold uppercase tracking-[0.08em] text-slate-300;
+  }
+
+  .limits-table td {
+    @apply text-slate-200;
+  }
+
+  .alert-feed {
+    @apply m-0 max-h-[250px] list-none space-y-2 overflow-auto p-0;
+  }
+
+  .alert-feed li {
+    @apply grid grid-cols-[64px_78px_1fr] items-center gap-2 rounded-lg border border-slate-700/70 bg-slate-950/80 px-2 py-2 text-xs;
+  }
+
+  .feed-time {
+    @apply font-mono text-slate-400;
+  }
+
+  .feed-status {
+    @apply rounded-full px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.08em];
+  }
+
+  .feed-status.normal {
+    @apply bg-emerald-500/10 text-emerald-300;
+  }
+
+  .feed-status.warning {
+    @apply bg-amber-500/10 text-amber-300;
+  }
+
+  .feed-status.critical {
+    @apply bg-red-500/10 text-red-300;
+  }
+
+  .feed-text {
+    @apply text-slate-200;
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.35);
+  }
+}
